@@ -1,0 +1,37 @@
+[package]
+name = "fastapi_rs"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "fastapi_rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+# PyO3 bindings
+# - extension-module: required when building a Python C-extension via Maturin
+# - abi3-py39: builds a wheel compatible across Python 3.9+ without recompiling per Python version
+# - anyhow: ergonomic error handling across Rust/Python boundary
+pyo3 = { version = "0.22", features = ["extension-module", "abi3-py39", "anyhow"] }
+
+# Async runtime & HTTP primitives (for handling ASGI / async routes)
+tokio = { version = "1.38", features = ["full"] }
+pyo3-async-runtimes = { version = "0.22", features = ["tokio-runtime"] }
+
+# Serialization & JSON handling (Pydantic / Response layer)
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Routing & URL path matching (e.g., /users/{id})
+matchit = "0.8"
+
+# Utilities
+parking_lot = "0.12"      # Fast, lightweight synchronization primitives
+thiserror = "1.0"        # Structured error types
+
+[profile.release]
+# Optimizations for minimal binary size and faster execution
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
